@@ -697,6 +697,8 @@ NerfDataset load_nerf(const std::vector<fs::path>& jsonpaths, float sharpen_amou
 			result.xforms[i_img].start = result.nerf_matrix_to_ngp(result.xforms[i_img].start);
 			result.xforms[i_img].end = result.nerf_matrix_to_ngp(result.xforms[i_img].end);
 
+            result.metadata[i_img].locked_extrinsics = frame.value("locked_extrinsics", false);
+
 			progress.update(++n_loaded);
 		}, futures);
 

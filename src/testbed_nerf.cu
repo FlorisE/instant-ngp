@@ -3122,18 +3122,26 @@ void Testbed::train_nerf(uint32_t target_batch_size, bool get_loss_scalar, cudaS
 
 			// Optimization step
 			for (uint32_t i = 0; i < m_nerf.training.n_images_for_training; ++i) {
-				vec3 pos_gradient = m_nerf.training.cam_pos_gradient[i] * per_camera_loss_scale;
-				vec3 rot_gradient = m_nerf.training.cam_rot_gradient[i] * per_camera_loss_scale;
+                if (!m_nerf.training.dataset.metadata[i].locked_extrinsics) {
+                    vec3 pos_gradient = m_nerf.training.cam_pos_gradient[i] * per_camera_loss_scale;
+                    vec3 rot_gradient = m_nerf.training.cam_rot_gradient[i] * per_camera_loss_scale;
 
-				float l2_reg = m_nerf.training.extrinsic_l2_reg;
-				pos_gradient += m_nerf.training.cam_pos_offset[i].variable() * l2_reg;
-				rot_gradient += m_nerf.training.cam_rot_offset[i].variable() * l2_reg;
+                    float l2_reg = m_nerf.training.extrinsic_l2_reg;
+                    pos_gradient += m_nerf.training.cam_pos_offset[i].variable() * l2_reg;
+                    rot_gradient += m_nerf.training.cam_rot_offset[i].variable() * l2_reg;
 
-				m_nerf.training.cam_pos_offset[i].set_learning_rate(std::max(m_nerf.training.extrinsic_learning_rate * std::pow(0.33f, (float)(m_nerf.training.cam_pos_offset[i].step() / 128)), m_optimizer->learning_rate()/1000.0f));
-				m_nerf.training.cam_rot_offset[i].set_learning_rate(std::max(m_nerf.training.extrinsic_learning_rate * std::pow(0.33f, (float)(m_nerf.training.cam_rot_offset[i].step() / 128)), m_optimizer->learning_rate()/1000.0f));
+                    m_nerf.training.cam_pos_offset[i].set_learning_rate(std::max(
+                            m_nerf.training.extrinsic_learning_rate *
+                            std::pow(0.33f, (float) (m_nerf.training.cam_pos_offset[i].step() / 128)),
+                            m_optimizer->learning_rate() / 1000.0f));
+                    m_nerf.training.cam_rot_offset[i].set_learning_rate(std::max(
+                            m_nerf.training.extrinsic_learning_rate *
+                            std::pow(0.33f, (float) (m_nerf.training.cam_rot_offset[i].step() / 128)),
+                            m_optimizer->learning_rate() / 1000.0f));
 
-				m_nerf.training.cam_pos_offset[i].step(pos_gradient);
-				m_nerf.training.cam_rot_offset[i].step(rot_gradient);
+                    m_nerf.training.cam_pos_offset[i].step(pos_gradient);
+                    m_nerf.training.cam_rot_offset[i].step(rot_gradient);
+                }
 			}
 
 			m_nerf.training.update_transforms();

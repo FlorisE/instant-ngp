@@ -42,6 +42,7 @@ struct TrainingImageMetadata {
 	vec2 focal_length = vec2(1000.f);
 	vec4 rolling_shutter = vec4(0.0f);
 	vec3 light_dir = vec3(0.f); // TODO: replace this with more generic float[] of task-specific metadata.
+    bool locked_extrinsics = false;
 };
 
 inline size_t image_type_size(EImageDataType type) {

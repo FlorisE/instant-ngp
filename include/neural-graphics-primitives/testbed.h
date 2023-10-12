@@ -1212,6 +1212,7 @@ public:
 	} m_distortion;
 
 	std::shared_ptr<NerfNetwork<network_precision_t>> m_nerf_network;
+	bool m_network_needs_reset = false;
 };
 
 }

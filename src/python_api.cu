@@ -385,6 +385,7 @@ PYBIND11_MODULE(pyngp, m) {
 		.def(py::init<ETestbedMode, const fs::path&, const fs::path&>())
 		.def(py::init<ETestbedMode, const fs::path&, const json&>())
 		.def_readonly("mode", &Testbed::m_testbed_mode)
+		.def_property_readonly("data_path", [](const py::object& obj) { return obj.cast<Testbed&>().m_data_path.str(); })
 		.def("create_empty_nerf_dataset", &Testbed::create_empty_nerf_dataset, "Allocate memory for a nerf dataset with a given size", py::arg("n_images"), py::arg("aabb_scale")=1, py::arg("is_hdr")=false)
 		.def("load_training_data", &Testbed::load_training_data, py::call_guard<py::gil_scoped_release>(), "Load training data from a given path.")
 		.def("clear_training_data", &Testbed::clear_training_data, "Clears training data to free up GPU memory.")
